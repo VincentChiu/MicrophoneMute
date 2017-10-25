@@ -76,11 +76,11 @@ namespace MicrophoneMute
             }
             if (defaultDevice.AudioEndpointVolume.Mute)
             {
-                ShowNotification("麦克风", "麦克风已被静音");
+                ShowNotification("麦克风", "麦克风静音");
             }
             else
             {
-                ShowNotification("麦克风", "麦克风取消静音");
+                ShowNotification("麦克风", "麦克风恢复");
             }
             Delay(3);
         }
