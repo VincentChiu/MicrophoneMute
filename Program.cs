@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Drawing;
+using System.Media;
 
 using CoreAudioApi;
+using ToastNotifications;
 
 namespace MicrophoneMute
 {
@@ -36,13 +34,37 @@ namespace MicrophoneMute
             defaultDevice = devEnum.GetDefaultAudioEndpoint(EDataFlow.eCapture, ERole.eMultimedia);
         }
 
+        static void PlayNotificationSound(string sound)
+        {
+            SoundPlayer sp = new SoundPlayer(MicrophoneMute.Properties.Resources.normal);
+            sp.Play();
+        }
+
+        static void ShowNotification(string tipTitle, string tipBody)
+        {
+            int duration = 1;
+            var animationMethod = FormAnimator.AnimationMethod.Slide;
+            var animationDirection = FormAnimator.AnimationDirection.Up;
+            var toastNotification = new Notification(tipTitle, tipBody, duration, animationMethod, animationDirection);
+            PlayNotificationSound("normal");
+            toastNotification.Show();
+        }
+
+        public static bool Delay(int delayTime)
+        {
+            DateTime now = DateTime.Now;
+            int s;
+            do
+            {
+                TimeSpan spand = DateTime.Now - now;
+                s = spand.Seconds;
+                Application.DoEvents();
+            }
+            while (s < delayTime);
+            return true;
+        }
         static void Main(string[] args)
         {
-            NotifyIcon btIcon = new NotifyIcon();
-            btIcon.Icon = Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath); // new Icon(args[0]);
-            btIcon.Visible = true;
-            ToolTipIcon btToolTipIcon = new ToolTipIcon();
-
             muteInit();
             if (defaultDevice.AudioEndpointVolume.Mute)
             {
@@ -54,13 +76,13 @@ namespace MicrophoneMute
             }
             if (defaultDevice.AudioEndpointVolume.Mute)
             {
-                btIcon.ShowBalloonTip(1, "麦克风", "麦克风已被静音", btToolTipIcon);
+                ShowNotification("麦克风", "麦克风已被静音");
             }
             else
             {
-                btIcon.ShowBalloonTip(1, "麦克风", "麦克风取消静音", btToolTipIcon);
+                ShowNotification("麦克风", "麦克风取消静音");
             }
-            btIcon.Dispose();
+            Delay(3);
         }
     }
 }
